@@ -7,7 +7,7 @@ description: Imagen inmutable personalizada para CAD basada en Fedora Kinoite
 
 # the base image to build on top of (FROM) and the version tag to use
 base-image: ghcr.io/ublue-os/kinoite-main
-image-version: 39
+image-version: 44
 
 # module configuration, executed in order
 modules:
@@ -74,3 +74,5 @@ modules:
   - type: akmods
     install:
       - nvidia
+
+  - type: signing # this sets up the proper policy & signing files for signed images to work fully
