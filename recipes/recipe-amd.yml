@@ -90,3 +90,4 @@ modules:
     properties:
       PRETTY_NAME: "IEBurela Fedora 44"
       NAME: "IEBurela CAD OS"
+      LOGO: "ieburela-logo"
