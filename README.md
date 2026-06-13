@@ -124,18 +124,29 @@ sudo systemd-cryptenroll --tpm2-device=auto --wipe-slot=tpm2 /dev/sda3
 ```
 
 ### 5. Montar NFS con Soporte de Caché (FS-Cache)
-El servicio `cachefilesd` ya viene habilitado de fábrica en esta imagen. Para montar una carpeta de red y que almacene archivos temporalmente en el disco local para acceso rápido, usa la bandera `fsc`.
+El servicio `cachefilesd` ya viene habilitado de fábrica en esta imagen. Para evitar que el sistema se cuelgue si el NAS se apaga, utilizaremos el **automontaje bajo demanda** de systemd, junto con la bandera de caché local (`fsc`).
+
+Primero crea la carpeta donde aparecerán los archivos:
+```bash
+sudo mkdir -p /mnt/ruta_local
+```
 
 Edita tu archivo `/etc/fstab`:
 ```bash
 sudo nano /etc/fstab
 ```
-Y añade la línea de montaje con la opción `fsc`:
+Y añade la línea de montaje con las opciones a prueba de fallos:
 ```text
-10.24.26.x:/ruta/nfs  /mnt/ruta_local  nfs  defaults,fsc  0  0
+tu-servidor-nas.com:/ruta/en/el/nas  /mnt/ruta_local  nfs  noauto,x-systemd.automount,x-systemd.idle-timeout=10min,fsc  0  0
 ```
 
-Aplica los cambios montando la carpeta:
+Para que Linux detecte el cambio en el archivo, recarga el gestor de servicios:
 ```bash
-sudo mount -a
+sudo systemctl daemon-reload
 ```
+
+Finalmente, inicia el servicio de automontaje:
+```bash
+sudo systemctl start mnt-ruta_local.automount
+```
+*(A partir de ahora, el NAS se conectará automáticamente en el momento exacto en el que abras la carpeta `/mnt/ruta_local`).*
