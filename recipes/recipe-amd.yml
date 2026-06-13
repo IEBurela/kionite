@@ -87,6 +87,6 @@ modules:
 
   # CUSTOM BRANDING
   - type: os-release
-    mac: IEBurela Fedora 44
-    pretty_name: "IEBurela Fedora 44"
-    name: "IEBurela CAD OS"
+    properties:
+      PRETTY_NAME: "IEBurela Fedora 44"
+      NAME: "IEBurela CAD OS"
