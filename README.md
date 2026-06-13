@@ -89,5 +89,53 @@ sudo systemctl reboot
 ## Arquitectura
 
 - **Base AMD:** `kinoite-main` (Soporte nativo del kernel).
-- **Base Nvidia:** `kinoite-nvidia` (Drivers propietarios precompilados).
-- **Actualizaciones:** Automatizadas y gestionadas por `ublue-update` (descarga en segundo plano, se aplica al reiniciar).
+  - **Base Nvidia:** `kinoite-nvidia` (Drivers propietarios precompilados).
+  - **Actualizaciones:** Automatizadas y gestionadas por `ublue-update` (descarga en segundo plano, se aplica al reiniciar).
+
+## 🛠️ Post-Instalación (Nuevos Equipos)
+
+Una vez que la máquina haya reiniciado en la nueva imagen personalizada (`IEBurela Fedora 44`), debes ejecutar estos comandos **una sola vez** para integrarla a la red corporativa.
+
+### 1. Establecer el Nombre de Host (Hostname)
+Evita colisiones de DNS asignando un nombre único antes de unir la máquina a la red.
+```bash
+sudo hostnamectl set-hostname nombre-unico.ieburela.com
+```
+
+### 2. Activar la VPN (Tailscale)
+Conecta la máquina a la red privada (requerirá autenticación vía navegador).
+```bash
+sudo tailscale up
+```
+
+### 3. Unir al Dominio (FreeIPA)
+Une la máquina al directorio activo para autenticación centralizada.
+*(Si el DNS interno no resuelve automáticamente por estar detrás de un proxy como Cloudflare, usa `--fixed-primary` y especifica el servidor).*
+```bash
+sudo mkdir -p /var/lib/ipa-client/sysrestore /var/lib/ipa-client/pki
+sudo ipa-client-install --server=ipa.ieburela.com --domain=ieburela.com --fixed-primary
+```
+
+### 4. Desbloqueo Automático de Disco (TPM)
+Si el disco está cifrado con LUKS, vincula la partición al chip TPM de la tarjeta madre para que se desbloquee automáticamente al encender.
+*(Asegúrate de cambiar `/dev/sda3` por el nombre real de tu partición cifrada usando `lsblk`).*
+```bash
+sudo systemd-cryptenroll --tpm2-device=auto --wipe-slot=tpm2 /dev/sda3
+```
+
+### 5. Montar NFS con Soporte de Caché (FS-Cache)
+El servicio `cachefilesd` ya viene habilitado de fábrica en esta imagen. Para montar una carpeta de red y que almacene archivos temporalmente en el disco local para acceso rápido, usa la bandera `fsc`.
+
+Edita tu archivo `/etc/fstab`:
+```bash
+sudo nano /etc/fstab
+```
+Y añade la línea de montaje con la opción `fsc`:
+```text
+10.24.26.x:/ruta/nfs  /mnt/ruta_local  nfs  defaults,fsc  0  0
+```
+
+Aplica los cambios montando la carpeta:
+```bash
+sudo mount -a
+```
