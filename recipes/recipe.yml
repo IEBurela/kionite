@@ -11,6 +11,11 @@ image-version: 44
 
 # module configuration, executed in order
 modules:
+  - type: files
+    files:
+      - source: system
+        destination: / # copies files/system/* into your image's root folder /
+
   # DESCARGAR E INSTALAR SEAFILE DRIVE APPIMAGE
   - type: script
     snippets:
@@ -30,7 +35,6 @@ modules:
       - clamav-update
       - usbguard
       - tpm2-tools
-      - veracrypt
     remove:
       - firefox
       - firefox-langpacks
@@ -63,6 +67,7 @@ modules:
           - org.gimp.GIMP
           - org.kde.krita
           - org.cloudcompare.CloudCompare
+          - com.veracrypt.VeraCrypt
 
   # SOPORTE PARA NVIDIA
   - type: akmods
