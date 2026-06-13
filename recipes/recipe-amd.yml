@@ -36,6 +36,11 @@ modules:
       - clamav-update
       - usbguard
       - tpm2-tools
+      - freeipa-client
+      - sssd-ipa
+      - oddjob-mkhomedir
+      - cachefilesd
+      - nfs-utils
     remove:
       - firefox
       - firefox-langpacks
@@ -47,6 +52,14 @@ modules:
         - tailscaled.service
         - usbguard.service
         - clamav-freshclam.service
+        - cachefilesd.service
+        - firewalld.service
+
+  # CONFIGURACIÓN DE FIREWALL
+  - type: script
+    snippets:
+      - "firewall-offline-cmd --set-default-zone=drop"
+      - "firewall-offline-cmd --zone=drop --add-service=ssh"
 
   # APLICACIONES DE USUARIO (FLATPAKS)
   - type: default-flatpaks
