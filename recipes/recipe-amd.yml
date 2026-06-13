@@ -55,11 +55,12 @@ modules:
         - cachefilesd.service
         - firewalld.service
 
-  # CONFIGURACIÓN DE FIREWALL
+  # CONFIGURACIÓN DE FIREWALL Y ZONA HORARIA
   - type: script
     snippets:
       - "firewall-offline-cmd --set-default-zone=drop"
       - "firewall-offline-cmd --zone=drop --add-service=ssh"
+      - "ln -sf /usr/share/zoneinfo/America/Mexico_City /etc/localtime"
 
   # APLICACIONES DE USUARIO (FLATPAKS)
   - type: default-flatpaks
@@ -83,3 +84,9 @@ modules:
           - org.cloudcompare.CloudCompare
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
+
+  # CUSTOM BRANDING
+  - type: os-release
+    mac: IEBurela Fedora 44
+    pretty_name: "IEBurela Fedora 44"
+    name: "IEBurela CAD OS"
